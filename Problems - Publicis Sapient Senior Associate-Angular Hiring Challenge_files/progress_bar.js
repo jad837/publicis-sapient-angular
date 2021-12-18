@@ -1,0 +1,13 @@
+/**
+ * @File: progress_bar.js
+ * @Version: 1
+ * @Dependencies: JQUERY
+ * @Constructor Arguments:
+ *      selector: main source element for which upload progress will be tracked
+ *                   and it's type can be a 'FORM' or 'INPUT' type,
+ *      root_div: parent div element for progressbar widget insertion,
+ *      options(optional): js object that contains options and their values as key value pairs
+ *
+ * @Description: Implements custom progress bar widget for ajax forms with
+ * file fields, individual asynchronous file uploads.
+ */var HEProgressBar=function(){return function(a,b,c){var d=this;this.selector=$(a),this.selector_type=$(a)[0].nodeName,this.root_div=$(b),this.files_attached=!1,this.trackProgress=function(){var a=$.ajaxSettings.xhr();if(d.selector_type=="FORM"){var b=$(d.selector).find("input[type=file]");if(b.length>0)for(var e=0;e<b.length;e++)b[e].files.length>0&&(d.files_attached=!0)}else d.selector_type=="INPUT"&&$(d.selector).attr("type")=="file"&&$(d.selector)[0].files.length>0&&(d.files_attached=!0);c||(c="#73b369");if(a.upload&&d.files_attached){var f='<div class="clear"></div><div class="progress-bar-container"><div class="progress-label-box"><div class="progress-label text dark">'+UPLOADING_TEXT+"</div>"+'<div class="progress-percentage text dark"></div>'+"</div>"+'<div class="clear"></div>'+'<div class="progress-bar-box">'+'<div class="progress-bar"></div>'+"</div>"+'<div class="clear"></div>'+"</div>";$(d.root_div).html(f);var g=$(d.root_div).find(".progress-bar");a.upload.addEventListener("progress",function(a){if(a.lengthComputable){var b=Math.floor(a.loaded/a.total*100);g.css({width:b+"%","background-color":c}),$(d.root_div).find(".progress-percentage").html(b+"%  ...")}else debug&&console.log("Unable to compute upload progress!")},!1),a.upload.onload=function(){$(d.root_div).find(".progress-label-box").html(UPLOADED_TEXT+" "+SAVING_TEXT),$(d.root_div).find(".progress-bar").css({"background-color":c})}}return a},this.ajax_settings={xhr:this.trackProgress},this.ajax=function(a){d.selector_type=="FORM"&&a.dataType&&delete a.dataType;var a=$.extend({},a,d.ajax_settings),b=a.success;a.success=function(a){response_status=a.status,b(a);if(d.files_attached){var c=3e3;$(d.root_div).find(".progress-bar-container").fadeOut(c);var e="";response_status=="ERROR"?e=UPLOAD_ERROR_MESSAGE:e=UPLOAD_SUCCESS_MESSAGE,addAlert(e,!1)}};var c=$.ajax(a);return c}}}();
